@@ -69,6 +69,7 @@ def main():
         for t in t1:
             d_traj_iterators.append(sampler.sample_task([t]))
 
+
         d_rand_iterator = sampler.get_complete_iterator()
 
         x_spt, y_spt, x_qry, y_qry = maml.sample_training_data_paper(d_traj_iterators, d_rand_iterator,

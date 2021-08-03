@@ -184,7 +184,6 @@ class MetaLearingClassification(nn.Module):
         self.update_lr = args['update_lr']
         self.meta_lr = args['meta_lr']
         self.update_step = args['update_step']
-
         self.net = Learner.Learner(config)
         self.optimizer = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
@@ -388,10 +387,20 @@ class MetaLearingClassification(nn.Module):
                 classification_accuracy = torch.eq(pred_q, y_rand[0]).sum().item()  # convert to numpy
                 accuracy_meta_set[k + 1] = accuracy_meta_set[k + 1] + classification_accuracy
 
+        second_pass_loss = torch.zeros(1).to("cuda")
+
+        for k in range(0, len(x_traj)):
+            # Evaluating the loss of the first few samples after full pass of adaptation
+            logits = self.net(x_traj[k], fast_weights)
+            loss = F.cross_entropy(logits, y_traj[k])
+            print(loss)
+            second_pass_loss += loss
+
         # Taking the meta gradient step
         self.optimizer.zero_grad()
-        meta_loss = meta_losses[-1]
-        meta_loss.backward()
+        # meta_loss = meta_losses[-1]
+        # meta_loss.backward()
+        second_pass_loss.backward()
 
         self.optimizer.step()
         accuracies = np.array(accuracy_meta_set) / len(x_rand[0])

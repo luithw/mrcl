@@ -319,6 +319,7 @@ class SampleOmni:
             trainset = copy.deepcopy(self.testset)
         class_labels = np.array([x[1] for x in trainset._flat_character_images])
 
+
         indices = np.zeros_like(class_labels)
         for a in task:
             indices = indices + (class_labels == a).astype(int)
